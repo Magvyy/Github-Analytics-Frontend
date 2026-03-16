@@ -1,29 +1,24 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import './App.css'
-import { logout } from '@/shared/services/logout';
+import RepoCommitsOverview from "@/src/pages/repos/RepoCommitsOverview";
+import Layout from './Layout';
+import ReposPage from '@/src/pages/repos/ReposPage';
+import HomePage from '../pages/HomePage';
+import CommitsPerIntervalPage from '../pages/commits/CommitsPerIntervalPage';
 
-function App() {
+export default function App() {
 
     return (
-        // <>
-        //     <div
-        //         onClick={() => window.location.href = "http://localhost:8081/oauth2/authorization/github"}
-        //     >
-		// 		Login
-		// 	</div>
-        //     <div
-        //         onClick={() => logout()}
-        //     >
-		// 		Logout
-		// 	</div>
-        // </>
-		
-		<BrowserRouter>
-			<Routes>
-				<Route path="/" element={<Home />} />
-			</Routes>
-		</BrowserRouter>
+
+        <Layout>
+            <BrowserRouter>
+                <Routes>
+                    <Route path="/" element={<HomePage />} />
+                    <Route path="/repos" element={<ReposPage />} />
+                    <Route path="/commits" element={<CommitsPerIntervalPage />} />
+                    <Route path="/repos/:repoId/commits" element={<RepoCommitsOverview />} />
+                </Routes>
+            </BrowserRouter>
+        </Layout>
     )
 }
-
-export default App
