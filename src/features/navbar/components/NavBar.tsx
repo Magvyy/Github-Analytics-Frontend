@@ -10,7 +10,7 @@ export function NavBar() {
     
 
     return (
-        <NavigationMenu className="min-w-full flex-0 p-2" id="navbar">
+        <NavigationMenu className="fixed top-0 left-0 right-0 z-1 min-w-full flex-0 p-2 bg-card">
             <NavigationMenuList className="flex flex-row justify-between">
                 <div className="flex flex-row gap-2">
                     <NavigationMenuLink

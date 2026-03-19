@@ -14,7 +14,9 @@ import {
     type ChartConfig,
 } from "@/components/ui/chart"
 import type { RepoResponse } from "@/src/api/RepoAPI"
-import type { RepoCommitsPerUser } from "@/src/api/AnalyticsAPI"
+import { CommitRole, type RepoCommitsPerUser } from "@/src/api/AnalyticsAPI"
+import { CommitRoleSelector } from "./CommitRoleSelector"
+import { useState } from "react"
 
 const chartConfig: ChartConfig = {
 	commits: {
@@ -29,37 +31,47 @@ interface chartDataProps {
 }
 
 interface RepoCommitsPieChartProps {
-    repo?: RepoResponse
-    aggregates: RepoCommitsPerUser[]
+    repo: RepoResponse
+    data: RepoCommitsPerUser[]
 }
-export default function RepoCommitsPieChart({ repo, aggregates }: RepoCommitsPieChartProps) {
+export default function RepoCommitsPieChart({ repo, data }: RepoCommitsPieChartProps) {
+    const [role, setRole] = useState<CommitRole>(CommitRole.AUTHOR);
+    const dataKey = role + "_commits";
+    
 	const chartData: chartDataProps[] = [];
-	aggregates.forEach((aggregate, index) => {
-        let userName = aggregate.user_name;
+	data.forEach((sample, index) => {
+        let userName = sample.user_name.replaceAll(" ", "_");
+        let commits = sample[dataKey as keyof RepoCommitsPerUser] as Number;
+        if (commits === 0) return;
 		chartData.push({
 			user: userName,
-			commits: aggregate.commits,
+            commits: commits,
 			fill: `var(--color-${userName})`
 		})
 		chartConfig[userName] = {
-			label: userName.replace("_", " "),
+			label: sample.user_name,
 			color: `var(--chart-${index % 5 + 1})`
 		};
 	});
 
-    const includeLegend = (chartData.length < 6);
+    const includeLegend = (chartData.length < 10);
 
     return (
         <Card className="flex flex-col">
-            <CardHeader className="items-center pb-0">
-                <CardTitle>{repo?.name} - Commits Distribution</CardTitle>
-            </CardHeader>
-            <CardContent className="flex-1 pb-0">
+            <CardHeader className="grid grid-cols-[1fr_auto_1fr] border-b p-4">
+                <CommitRoleSelector
+                    role={role}
+                    setRole={setRole}
+                    className="col-1"
+                />
+                <CardTitle className="col-2">{repo?.name} - Commits Distribution</CardTitle>
+                </CardHeader>
+            <CardContent className="flex-1 pb-0 flex flex-col items-center">
                 <ChartContainer
                     config={chartConfig}
-                    className="mx-auto aspect-square max-h-[300px] pb-0 [&_.recharts-pie-label-text]:fill-foreground"
+                    className="aspect-square max-h-[300px] w-full pb-0 [&_.recharts-pie-label-text]:fill-foreground"
                 >
-                    <PieChart>
+                    <PieChart className="lg:flex flex-row">
                         <ChartTooltip content={<ChartTooltipContent hideLabel />} />
                         <Pie
                             data={chartData}
@@ -67,17 +79,17 @@ export default function RepoCommitsPieChart({ repo, aggregates }: RepoCommitsPie
                             labelLine={false}
                             label={({ payload, ...props }) => {
                                 return (
-                                <text
-                                    cx={props.cx}
-                                    cy={props.cy}
-                                    x={props.x}
-                                    y={props.y}
-                                    textAnchor={props.textAnchor}
-                                    dominantBaseline={props.dominantBaseline}
-                                    fill="hsla(var(--foreground))"
-                                >
-                                    {payload.commits}
-                                </text>
+                                    <text
+                                        cx={props.cx}
+                                        cy={props.cy}
+                                        x={props.x}
+                                        y={props.y}
+                                        textAnchor={props.textAnchor}
+                                        dominantBaseline={props.dominantBaseline}
+                                        fill="var(--foreground)"
+                                    >
+                                        {payload.commits}
+                                    </text>
                                 )
                             }}
                             nameKey="user"

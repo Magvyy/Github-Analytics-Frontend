@@ -37,31 +37,36 @@ const repo: RepoResponse = {
     owner: user1
 }
 
-const aggregates: RepoCommitsPerUser[] = [
+const data: RepoCommitsPerUser[] = [
     {
-        user_name: "User_1",
+        user_name: "User 1",
         repo_name: "Github Repo",
-        commits: 275
+        author_commits: 275,
+        committer_commits: 100
     },
     {
-        user_name: "User_2",
+        user_name: "User 2",
         repo_name: "Github Repo",
-        commits: 200
+        author_commits: 200,
+        committer_commits: 173
     },
     {
-        user_name: "User_3",
+        user_name: "User 3",
         repo_name: "Github Repo",
-        commits: 187
+        author_commits: 187,
+        committer_commits: 187
     },
     {
-        user_name: "User_4",
+        user_name: "User 4",
         repo_name: "Github Repo",
-        commits: 173
+        author_commits: 173,
+        committer_commits: 200
     },
     {
-        user_name: "User_5",
+        user_name: "User 5",
         repo_name: "Github Repo",
-        commits: 100
+        author_commits: 100,
+        committer_commits: 275
     },
 ]
 
@@ -70,7 +75,7 @@ export function RepoCommitsPieChartExample() {
     return (
         <RepoCommitsPieChart
             repo={repo}
-            aggregates={aggregates}
+            data={data}
         />
     )
 }

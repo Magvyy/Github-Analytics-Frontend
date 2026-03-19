@@ -1,4 +1,4 @@
-import { Interval } from "@/src/api/AnalyticsAPI"
+import { CommitRole } from "@/src/api/AnalyticsAPI"
 
 import {
     Select,
@@ -13,21 +13,19 @@ import { cn } from "@/lib/utils"
 
 const items = [
     // { label: "Select an interval", value: null },
-    { label: "Per day", value: Interval.DAY },
-    { label: "Per week", value: Interval.WEEK },
-    { label: "Per month", value: Interval.MONTH },
-    { label: "Per year", value: Interval.YEAR }
+    { label: "Author", value: CommitRole.AUTHOR },
+    { label: "Committer", value: CommitRole.COMMITTER }
 ]
 
-interface IntervalSelectorProps {
-    interval: Interval
-    setInterval: React.Dispatch<React.SetStateAction<Interval>>
+interface CommitRoleSelectorProps {
+    role: CommitRole
+    setRole: React.Dispatch<React.SetStateAction<CommitRole>>
     className?: string
 }
-export function IntervalSelector({ interval, setInterval, className }: IntervalSelectorProps) {
+export function CommitRoleSelector({ role, setRole, className }: CommitRoleSelectorProps) {
 
     return (
-        <Select value={interval} onValueChange={(newInterval: Interval | null) => {if (newInterval !== null) setInterval(newInterval)}}>
+        <Select value={role} onValueChange={(newRole: CommitRole | null) => {if (newRole != null) setRole(newRole)}}>
             <SelectTrigger className={cn(
                 "w-[180px]",
                 className

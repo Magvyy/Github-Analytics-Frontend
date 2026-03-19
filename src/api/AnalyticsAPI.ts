@@ -3,7 +3,8 @@
 export interface RepoCommitsPerUser {
         user_name: string
         repo_name: string
-        commits: number
+        author_commits: number
+        committer_commits: number
 }
 
 export enum Interval {
@@ -13,9 +14,16 @@ export enum Interval {
         YEAR = "year"
 }
 
+
+export enum CommitRole {
+        COMMITTER = "committer",
+        AUTHOR = "author"
+}
+
 export interface UserCommitsPerInterval {
         interval: string
         label: string
         user_name: string
-        commits: number
+        author_commits: number
+        committer_commits: number
 }

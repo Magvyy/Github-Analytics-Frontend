@@ -21,17 +21,21 @@ export default function RepoItem({ repo, className }: RepoItemProps) {
     return (
         <Item key={repo.name} variant="outline" role="listitem"
             className={cn(
-                "w-full",
+                "w-full bg-card",
                 className
             )}
+            render={
+                <a href={`/repos/${repo.id}/commits`}>
+                    <ItemContent>
+                        <ItemTitle className="line-clamp-1">
+                            {repo.name} -{" "}
+                            <span className="text-muted-foreground">{repo.owner.name}</span>
+                        </ItemTitle>
+                        <ItemDescription>{repo.owner.name}</ItemDescription>
+                    </ItemContent>
+                </a>
+            }
         >
-            <ItemContent>
-                <ItemTitle className="line-clamp-1">
-                    {repo.name} -{" "}
-                    <span className="text-muted-foreground">{repo.owner.name}</span>
-                </ItemTitle>
-                <ItemDescription>{repo.owner.name}</ItemDescription>
-            </ItemContent>
         </Item>
     )
 }

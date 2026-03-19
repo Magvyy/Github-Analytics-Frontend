@@ -13,9 +13,11 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from "@/components/ui/chart"
-import { Interval, type UserCommitsPerInterval } from "@/src/api/AnalyticsAPI"
+import { CommitRole, Interval, type UserCommitsPerInterval } from "@/src/api/AnalyticsAPI"
 import { format } from "../services/Formatting"
 import { IntervalSelector } from "./IntervalSelector"
+import { CommitRoleSelector } from "../../repos/components/CommitRoleSelector"
+import { useState } from "react"
 
 
 
@@ -36,11 +38,14 @@ interface UserCommitsPerIntervalBarChartProps {
     data: UserCommitsPerInterval[]
 }
 export function UserCommitsPerIntervalBarChart({ interval, setInterval, data }: UserCommitsPerIntervalBarChartProps) {
+    const [role, setRole] = useState<CommitRole>(CommitRole.AUTHOR);
+    const dataKey = role + "_commits";
+
 	const chartData: chartDataProps[] = [];
-	data.forEach((sample) => {
+	data.forEach((sample: UserCommitsPerInterval) => {
         chartData.push({
             interval: sample["interval"],
-            commits: sample.commits
+            commits: sample[dataKey as keyof UserCommitsPerInterval] as Number
         });
 	});
     let userName = data[0].user_name;
@@ -48,18 +53,21 @@ export function UserCommitsPerIntervalBarChart({ interval, setInterval, data }: 
         label: userName.replace("_", " "),
         color: `var(--chart-1)`
     };
-
+    
     return (
         <Card className="py-0">
-            <CardHeader className="flex flex-col items-stretch border-b p-0! sm:flex-row">
-                <div className="grid grid-cols-[1fr_auto_1fr] w-full gap-1 px-4 py-4">
-                    <IntervalSelector
-                        interval={interval}
-                        setInterval={setInterval}
-                        className="col-1"
-                    />
-                    <CardTitle className="col-2">User Commits Activity</CardTitle>
-                </div>
+            <CardHeader className="grid grid-cols-[1fr_1fr_1fr_auto_1fr_1fr_1fr] border-b p-4">
+                <CommitRoleSelector
+                    role={role}
+                    setRole={setRole}
+                    className="col-1"
+                />
+                <IntervalSelector
+                    interval={interval}
+                    setInterval={setInterval}
+                    className="col-2"
+                />
+                <CardTitle className="col-4">User Commits Activity</CardTitle>
             </CardHeader>
             <CardContent className="px-2 sm:p-6">
                 <ChartContainer
@@ -96,7 +104,7 @@ export function UserCommitsPerIntervalBarChart({ interval, setInterval, data }: 
                                 />
                             }
                         />
-                        <Bar dataKey="commits" fill={`var(--chart-3)`} />
+                        <Bar dataKey={"commits"} fill={`var(--chart-1)`} />
                     </BarChart>
                 </ChartContainer>
             </CardContent>
