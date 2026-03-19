@@ -28,7 +28,9 @@ export default function CircularNode({ data }: CircularNodeProps) {
                 <p>Author: {author}</p>
                 <p>Committer: {committer}</p>
             </NodeTooltipContent>
-            <NodeTooltipTrigger className="w-[15px] h-[15px] bg-primary rounded-[50%]">
+            <NodeTooltipTrigger className="w-[15px] h-[15px] bg-primary rounded-[50%]" onClick={() => {
+                window.location.href = `/commits/${id}`;
+            }}>
                 <Handle
                     type="target"
                     position={Position.Top}

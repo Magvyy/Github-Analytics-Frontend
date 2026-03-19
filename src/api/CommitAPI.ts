@@ -11,7 +11,7 @@ export interface CommitResponse {
         committer: UserResponse
 }
 
-export interface CommitTree {
-        commit: CommitResponse
-        children: CommitResponse[]
+export interface CommitTreeNode {
+        commit: Omit<CommitResponse, "repo">
+        children: string[]
 }

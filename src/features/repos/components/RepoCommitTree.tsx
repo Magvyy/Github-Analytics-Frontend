@@ -2,7 +2,7 @@ import { useCallback, useEffect } from 'react';
 import { ReactFlow, addEdge, type Node, type Edge, useNodesState, useEdgesState, ConnectionLineType, type Connection } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
-import type { CommitResponse, CommitTree } from "@/src/api/CommitAPI"
+import type { CommitTreeNode } from "@/src/api/CommitAPI"
 import StraightEdge from './react-flow/StraightEdge';
 import CircularNode from './react-flow/CircularNode';
 import { getLayoutedElements } from '../services/getLayoutedElements';
@@ -16,7 +16,7 @@ const nodeTypes = {
 }
 
 interface RepoCommitTreeProps {
-    data: CommitTree[]
+    data: CommitTreeNode[]
 }
 export function RepoCommitTree({ data }: RepoCommitTreeProps) {
     const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
@@ -25,17 +25,20 @@ export function RepoCommitTree({ data }: RepoCommitTreeProps) {
     // Edge has { id: str, source: str, target: str, type: str, animated: boolean }
 
     useEffect(() => {
-        const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(data);
-        setNodes(layoutedNodes);
-        setEdges(layoutedEdges);
+        const handleLayout = async () => {
+            const { nodes: layoutedNodes, edges: layoutedEdges } = await getLayoutedElements(data);
+            setNodes(layoutedNodes);
+            setEdges(layoutedEdges);
+        }
+        handleLayout();
     }, [data])
 
     const onConnect = useCallback((params: Connection) => setEdges(eds => addEdge({ ...params, type: ConnectionLineType.Straight }, eds)), []);
-    const onLayout = useCallback((direction: string) => {
-        const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(data, direction);
-        setNodes([...layoutedNodes]);
-        setEdges([...layoutedEdges]);
-    }, [nodes, edges]);
+    // const onLayout = useCallback((direction: string) => {
+    //     const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(data, direction);
+    //     setNodes([...layoutedNodes]);
+    //     setEdges([...layoutedEdges]);
+    // }, [nodes, edges]);
 
     return (
         <div className="w-full flex-1 flex flex-col py-6 bg-card rounded-2xl ring-1 ring-foreground/10 ">
@@ -45,6 +48,7 @@ export function RepoCommitTree({ data }: RepoCommitTreeProps) {
             <ReactFlow
                 nodes={nodes}
                 edges={edges}
+                nodeOrigin={[0.5, 0.5]}
                 nodeTypes={nodeTypes}
                 edgeTypes={edgeTypes}
                 onNodesChange={onNodesChange}
