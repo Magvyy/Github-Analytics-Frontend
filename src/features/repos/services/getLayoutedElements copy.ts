@@ -1,4 +1,4 @@
-import type { CommitResponse, CommitTree } from "@/src/api/CommitAPI";
+import type { CommitTreeNode } from "@/src/api/CommitAPI";
 import dagre from '@dagrejs/dagre';
 import { Position, type Edge, type Node } from "@xyflow/react";
 
@@ -8,14 +8,14 @@ const nodeHeight = 15;
 const dagreGraph = new dagre.graphlib.Graph().setDefaultEdgeLabel(() => ({}));
 
 
-export const getLayoutedElements = (data: CommitTree[], direction = "LR") => {
+export const getLayoutedElements = (data: CommitTreeNode[], direction = "LR") => {
     const isHorizontal = direction === "LR";
         dagreGraph.setGraph({ rankdir: direction });
 
         const nodes: Node[] = [];
         const edges: Edge[] = [];
 
-        data.forEach((commitTree: CommitTree) => {
+        data.forEach((commitTree: CommitTreeNode) => {
             const commit = commitTree.commit;
 
             nodes.push({
@@ -32,15 +32,15 @@ export const getLayoutedElements = (data: CommitTree[], direction = "LR") => {
             });
             dagreGraph.setNode(commit.id, { width: nodeWidth, height: nodeHeight })
 
-            commitTree.children.forEach((child: CommitResponse) => {
+            commitTree.children.forEach((childId: string) => {
                 edges.push({
-                    id: commit.id + " - " + child.id,
+                    id: commit.id + " - " + childId,
                     source: commit.id,
-                    target: child.id,
+                    target: childId,
                     type: "straight-edge",
                     animated: true
                 })
-                dagreGraph.setEdge(commit.id, child.id);
+                dagreGraph.setEdge(commit.id, childId);
             });
 
         })

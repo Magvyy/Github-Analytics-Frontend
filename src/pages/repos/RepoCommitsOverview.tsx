@@ -1,54 +1,42 @@
 import { useParams } from "react-router-dom"
 import { useEffect, useState } from "react"
 
-import env from "@/env/env.json";
 import RepoCommitsPieChart from "@/src/features/repos/components/RepoCommitsPieChart"
 import { defaultRepo, type RepoResponse } from "@/src/api/RepoAPI";
 import { type RepoCommitsPerUser } from "@/src/api/AnalyticsAPI";
-import type { CommitTree } from "@/src/api/CommitAPI";
+import type { CommitTreeNode } from "@/src/api/CommitAPI";
 import { RepoCommitTree } from "@/src/features/repos";
+import { apiCall } from "@/src/shared/services/apiCall";
 
 export default function RepoCommitsOverview() {
-	const { repoId } = useParams();
+	const { id } = useParams();
+
+    const [repoLoading, setRepoLoading] = useState<boolean>(true);
 	const [repo, setRepo] = useState<RepoResponse>(defaultRepo);
+	
+    const [repoCommitsLoading, setRepoCommitsLoading] = useState<boolean>(true);
 	const [repoCommitsPerUser, setRepoCommitsPerUser] = useState<RepoCommitsPerUser[]>([]);
-	const [tree, setTree] = useState<CommitTree[]>([]);
+	
+    const [treeLoading, setTreeLoading] = useState<boolean>(true);
+	const [tree, setTree] = useState<CommitTreeNode[]>([]);
 
 	useEffect(() => {
-		const fetchRepo = async () => {
-			let response = await fetch(env.backend + `/repos/${repoId}`, {
-				credentials: "include",
-				method: "GET"
-			});
-			setRepo(await response.json());
-		}
-		const fetchRepoCommitsPerUser = async () => {
-			let response = await fetch(env.backend + `/repos/${repoId}/per-user`, {
-				credentials: "include",
-				method: "GET"
-			});
-			setRepoCommitsPerUser(await response.json());
-		}
-		const fetchRepoCommitTree = async () => {
-			let response = await fetch(env.backend + `/repos/${repoId}/commit-tree`, {
-				credentials: "include",
-				method: "GET"
-			});
-			setTree(await response.json());
-		}
-		fetchRepo();
-		fetchRepoCommitsPerUser();
-		fetchRepoCommitTree();
+		apiCall(`/repos/${id}`, setRepo, setRepoLoading);
+		apiCall(`/repos/${id}/per-user`, setRepoCommitsPerUser, setRepoCommitsLoading);
+		apiCall(`/repos/${id}/commit-tree`, setTree, setTreeLoading);
 	}, []);
 
     return (
 		<>
 			<RepoCommitsPieChart
 				repo={repo}
+				repoLoading={repoLoading}
 				data={repoCommitsPerUser}
+				dataLoading={repoCommitsLoading}
 			/>
 			<RepoCommitTree
 				data={tree}
+				dataLoading={treeLoading}
 			/>
 		</>
     )

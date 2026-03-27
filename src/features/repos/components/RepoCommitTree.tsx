@@ -6,6 +6,7 @@ import type { CommitTreeNode } from "@/src/api/CommitAPI"
 import StraightEdge from './react-flow/StraightEdge';
 import CircularNode from './react-flow/CircularNode';
 import { getLayoutedElements } from '../services/getLayoutedElements';
+import Loader from '@/src/shared/components/Loader';
 
 const edgeTypes = {
     "straight-edge": StraightEdge
@@ -17,8 +18,9 @@ const nodeTypes = {
 
 interface RepoCommitTreeProps {
     data: CommitTreeNode[]
+    dataLoading: boolean
 }
-export function RepoCommitTree({ data }: RepoCommitTreeProps) {
+export function RepoCommitTree({ data, dataLoading }: RepoCommitTreeProps) {
     const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
     const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
     // Node has { id: str, type: str, data: { label: str }, position: { x: number, y: number } }
@@ -33,30 +35,25 @@ export function RepoCommitTree({ data }: RepoCommitTreeProps) {
         handleLayout();
     }, [data])
 
-    const onConnect = useCallback((params: Connection) => setEdges(eds => addEdge({ ...params, type: ConnectionLineType.Straight }, eds)), []);
-    // const onLayout = useCallback((direction: string) => {
-    //     const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(data, direction);
-    //     setNodes([...layoutedNodes]);
-    //     setEdges([...layoutedEdges]);
-    // }, [nodes, edges]);
-
     return (
-        <div className="w-full flex-1 flex flex-col py-6 bg-card rounded-2xl ring-1 ring-foreground/10 ">
+        <div className="w-full flex-1 flex flex-col py-6 bg-card rounded-2xl ring-1 ring-foreground/10">
             <p>
                 Commit branch
             </p>
-            <ReactFlow
-                nodes={nodes}
-                edges={edges}
-                nodeOrigin={[0.5, 0.5]}
-                nodeTypes={nodeTypes}
-                edgeTypes={edgeTypes}
-                onNodesChange={onNodesChange}
-                onEdgesChange={onEdgesChange}
-                nodesDraggable={false}
-                onConnect={onConnect}
-                className="flex-1 min-h-[400px]"
-            />
+            {dataLoading ?
+                <Loader/> :
+                <ReactFlow
+                    nodes={nodes}
+                    edges={edges}
+                    nodeTypes={nodeTypes}
+                    edgeTypes={edgeTypes}
+                    onNodesChange={onNodesChange}
+                    onEdgesChange={onEdgesChange}
+                    nodesDraggable={false}
+                    className="flex-1 min-h-[400px]"
+                    fitView
+                />
+            }
         </div>
     )
 }

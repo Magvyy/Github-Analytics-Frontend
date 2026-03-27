@@ -17,6 +17,7 @@ import type { RepoResponse } from "@/src/api/RepoAPI"
 import { CommitRole, type RepoCommitsPerUser } from "@/src/api/AnalyticsAPI"
 import { CommitRoleSelector } from "./CommitRoleSelector"
 import { useState } from "react"
+import Loader from "@/src/shared/components/Loader"
 
 const chartConfig: ChartConfig = {
 	commits: {
@@ -32,9 +33,11 @@ interface chartDataProps {
 
 interface RepoCommitsPieChartProps {
     repo: RepoResponse
+    repoLoading: boolean
     data: RepoCommitsPerUser[]
+    dataLoading: boolean
 }
-export default function RepoCommitsPieChart({ repo, data }: RepoCommitsPieChartProps) {
+export default function RepoCommitsPieChart({ repo, repoLoading, data, dataLoading }: RepoCommitsPieChartProps) {
     const [role, setRole] = useState<CommitRole>(CommitRole.AUTHOR);
     const dataKey = role + "_commits";
     
@@ -64,53 +67,51 @@ export default function RepoCommitsPieChart({ repo, data }: RepoCommitsPieChartP
                     setRole={setRole}
                     className="col-1"
                 />
-                <CardTitle className="col-2">{repo?.name} - Commits Distribution</CardTitle>
+                {repoLoading ?
+                    <Loader/> :
+                    <CardTitle className="col-2">{repo?.name} - Commits Distribution</CardTitle>
+                }
                 </CardHeader>
             <CardContent className="flex-1 pb-0 flex flex-col items-center">
-                <ChartContainer
-                    config={chartConfig}
-                    className="aspect-square max-h-[300px] w-full pb-0 [&_.recharts-pie-label-text]:fill-foreground"
-                >
-                    <PieChart className="lg:flex flex-row">
-                        <ChartTooltip content={<ChartTooltipContent hideLabel />} />
-                        <Pie
-                            data={chartData}
-                            dataKey="commits"
-                            labelLine={false}
-                            label={({ payload, ...props }) => {
-                                return (
-                                    <text
-                                        cx={props.cx}
-                                        cy={props.cy}
-                                        x={props.x}
-                                        y={props.y}
-                                        textAnchor={props.textAnchor}
-                                        dominantBaseline={props.dominantBaseline}
-                                        fill="var(--foreground)"
-                                    >
-                                        {payload.commits}
-                                    </text>
-                                )
-                            }}
-                            nameKey="user"
-                        />
-                        {includeLegend && 
-                            <ChartLegend
-                                content={<ChartLegendContent nameKey="user" />}
-                                className="-translate-y-2 flex-wrap gap-2 *:basis-1/4 *:justify-center"
+                {dataLoading ?
+                    <Loader/> :
+                    <ChartContainer
+                        config={chartConfig}
+                        className="aspect-square max-h-[300px] w-full pb-0 [&_.recharts-pie-label-text]:fill-foreground"
+                    >
+                        <PieChart className="lg:flex flex-row">
+                            <ChartTooltip content={<ChartTooltipContent hideLabel />} />
+                            <Pie
+                                data={chartData}
+                                dataKey="commits"
+                                labelLine={false}
+                                label={({ payload, ...props }) => {
+                                    return (
+                                        <text
+                                            cx={props.cx}
+                                            cy={props.cy}
+                                            x={props.x}
+                                            y={props.y}
+                                            textAnchor={props.textAnchor}
+                                            dominantBaseline={props.dominantBaseline}
+                                            fill="var(--foreground)"
+                                        >
+                                            {payload.commits}
+                                        </text>
+                                    )
+                                }}
+                                nameKey="user"
                             />
-                        }
-                    </PieChart>
-                </ChartContainer>
+                            {includeLegend && 
+                                <ChartLegend
+                                    content={<ChartLegendContent nameKey="user" />}
+                                    className="-translate-y-2 flex-wrap gap-2 *:basis-1/4 *:justify-center"
+                                />
+                            }
+                        </PieChart>
+                    </ChartContainer>
+                }
             </CardContent>
-            {/* <CardFooter className="flex-col gap-2 text-sm">
-                <div className="flex items-center gap-2 leading-none font-medium">
-                Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
-                </div>
-                <div className="leading-none text-muted-foreground">
-                Showing total visitors for the last 6 months
-                </div>
-            </CardFooter> */}
         </Card>
     )
 }

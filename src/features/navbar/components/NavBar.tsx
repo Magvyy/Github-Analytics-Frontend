@@ -25,6 +25,10 @@ export function NavBar() {
                         onClick={() => window.location.href = "/commits"}
                     >Commits
                     </NavigationMenuLink>
+                    <NavigationMenuLink
+                        onClick={() => window.location.href = "/commits/bc498bc2d7f784bd35c109b8b8d0d26e46395701"}
+                    >Example
+                    </NavigationMenuLink>
                 </div>
                 <div className="flex flex-row gap-2">
                     <NavigationMenuLink

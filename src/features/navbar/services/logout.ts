@@ -1,9 +1,7 @@
 import env from "@/env/env.json";
+import { apiCall } from "@/src/shared/services/apiCall";
 
 export const logout = async () => {
-        await fetch(env.backend + "/auth/logout", {
-                credentials: "include",
-                method: "GET"
-        });
+        await apiCall("/auth/logout");
         window.location.href = "/";
 }
